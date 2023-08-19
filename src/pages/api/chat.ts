@@ -30,7 +30,8 @@ export default async function handler(
   };
 
   // 向openai接口发起POST请求
-  const resp = await fetch("https://api.openai.com/v1/chat/completions", {
+  // https://api.openai.com/v1/chat/completions
+  const resp = await fetch("", {
     headers: {
       // process.env.OPENAI_API_KEY 从根目录下的.env文件中获取OPENAI_API_KEY的值
       Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
