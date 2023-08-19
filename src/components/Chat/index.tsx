@@ -57,6 +57,9 @@ export const Chat = () => {
     setChatLogs(list);
     const resp = await getCompletion({
       prompt: prompt,
+      // 每次发送消息时，同时携带之前最近四条的消息记录发送给AI，实现多轮对话功能
+      // 取之前最近几条，可根据具体业务进行确定
+      history: chatList.slice(-4),
     });
     // 输入prompt后发送消息时，设置输入框内容为空
     setPrompt("");

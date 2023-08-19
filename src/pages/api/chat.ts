@@ -1,12 +1,12 @@
 // chat聊天页面
 import type { NextApiRequest, NextApiResponse } from "next";
 
-
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
   // 从用户发出的请求体中获取prompt提示词、携带的历史记录内容(用于在当前对话中能访问之前的聊天上下文内容)，配置信息
+  // 通过history开启多轮对话的功能，携带前几轮对话的能让发送给AI，实现在当前对话中能够记住之前对话的内容
   const { prompt, history = [], options = {} } = req.body;
 
   // 模拟用户user向AI发出的对话信息
