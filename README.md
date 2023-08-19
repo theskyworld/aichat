@@ -1,38 +1,11 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+#### 流式响应
 
-## Getting Started
+##### 使用流式响应的必要性
 
-First, run the development server:
+- 用户角度：不会因为后端计算和返回数据的较长时间而产生大量的白屏或者 loading 时间，后端边计算边返回数据并进行渲染，提升用户体验度
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-```
+- 中间服务器转发的角度：对于一次页面向 API 接口发出的请求，Vercel规定对于个人普通用户来说，如果单次请求10s之内，后端还没有数据进行返回，则判断该次请求为一个失败的请求，将向前端抛出错误。如果采用流式响应的方式，能够让后端进行快速响应
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+##### 实现原理
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
-
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
-
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
-
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+后端和前端的请求之间采用管道流（stream）的方式进行通信，通信的数据在管道内进行长时间、持续性地传输，而不是后端一次性将数据全部返回给前端后中断此次的请求连接

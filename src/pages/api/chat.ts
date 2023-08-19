@@ -1,13 +1,19 @@
 // chat聊天页面
-import type { NextApiRequest, NextApiResponse } from "next";
+import { StreamPayload } from "@/types";
+import type { NextRequest } from "next/server";
+// 从eventsource-parser中导入
+// 解析后端发送的流式数据,解析成文本格式
+// https://www.npmjs.com/package/eventsource-parser
+import {
+  createParser,
+  ParseEvent,
+  ReconnectInterval,
+} from "eventsource-parser";
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
+export default async function handler(req: NextRequest) {
   // 从用户发出的请求体中获取prompt提示词、携带的历史记录内容(用于在当前对话中能访问之前的聊天上下文内容)，配置信息
   // 通过history开启多轮对话的功能，携带前几轮对话的能让发送给AI，实现在当前对话中能够记住之前对话的内容
-  const { prompt, history = [], options = {} } = req.body;
+  const { prompt, history = [], options = {} } = await req.json();
 
   // 模拟用户user向AI发出的对话信息
   const data = {
@@ -26,21 +32,89 @@ export default async function handler(
         content: prompt,
       },
     ],
+    // 告诉openai API 开启流式响应
+    stream: true,
     ...options,
   };
 
   // 向openai接口发起POST请求
   // https://api.openai.com/v1/chat/completions
-  const resp = await fetch("", {
-    headers: {
-      // process.env.OPENAI_API_KEY 从根目录下的.env文件中获取OPENAI_API_KEY的值
-      Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
-      "Content-Type": "application/json",
-    },
-    method: "POST",
-    body: JSON.stringify(data),
-  });
+  // const resp = await fetch("", {
+  //   headers: {
+  //     // process.env.OPENAI_API_KEY 从根目录下的.env文件中获取OPENAI_API_KEY的值
+  //     Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+  //     "Content-Type": "application/json",
+  //   },
+  //   method: "POST",
+  //   body: JSON.stringify(data),
+  // });
 
-  const json = await resp.json();
-  res.status(200).json({ ...json.choices[0].message });
+  // const json = await resp.json();
+  // res.status(200).json({ ...json.choices[0].message });
+
+  // 请求流式响应
+  const requestStream = async (payload: StreamPayload) => {
+    let counter = 0;
+    const resp = await fetch("https://api.openai.com/v1/chat/completions", {
+      headers: {
+        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      method: "POST",
+      body: JSON.stringify(payload),
+    });
+    if(resp.status !== 200) {
+      return resp.body;
+    }
+
+    return createStream(resp, counter);
+  };
+
+  // 根据接口返回的内容创建stream流，用于页面中进行流式响应展示
+  const createStream = (respsonse: Response, counter: number) => {
+    // 解析二进制流
+    const decoder = new TextDecoder("utf-8");
+    const encoder = new TextEncoder();
+    return new ReadableStream({
+      async start(controller) {
+        const onParse = (event: ParseEvent | ReconnectInterval) => {
+          if (event.type === "event") {
+            const data = event.data;
+            // 如果不需要进行解析
+            if (data === "[DONE]") {
+              controller.close();
+              return;
+            }
+            // 进行数据的解析
+            try {
+              const json = JSON.parse(data);
+              const text = json.choices[0]?.delta?.content || "";
+
+              // 不处理换行符
+              if (counter < 2 && (text.match(/\n/) || []).length) {
+                return;
+              }
+              const q = encoder.encode(text);
+              controller.enqueue(q);
+              counter++;
+            } catch (error) {
+              console.error(error);
+            }
+          }
+        };
+        const parser = createParser(onParse);
+        for await (const chunk of respsonse.body as any) {
+          // console.log(decoder.decode(chunk));
+          parser.feed(decoder.decode(chunk));
+        }
+      },
+    });
+  };
+
+  const stream = await requestStream(data);
+  return new Response(stream);
 }
+
+export const config = {
+  runtime: "edge",
+};

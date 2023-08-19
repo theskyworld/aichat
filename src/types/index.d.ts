@@ -1,18 +1,33 @@
-export declare interface ChatLogType {
+export type Role = "user" | "assistant" | "system";
+
+export declare interface Message {
   role: string;
   content: string;
 }
 
-export declare interface Props {
+export declare interface StreamParams {
   prompt: string;
-  history?: ChatLogType[];
+  history?: Message[];
   options?: {
     temperature?: number;
     max_tokens?: number;
   };
 }
 
-export declare type ChatLogs = ChatLogType[];
+export declare type MessageList = Message[];
 export declare interface ChatLogsStorage {
-  [key: string]: ChatLogs;
+  [key: string]: MessageList;
+}
+
+export declare interface StreamPayload {
+  model: string;
+  message: MessageList;
+  temperature?: number;
+  stream: boolean;
+  max_tokens?: number;
+}
+
+export declare interface Actions {
+  onCompleting: (sug: stirng) => void;
+  onCompleted?: (sug: string) => void;
 }

@@ -1,8 +1,8 @@
 // Chat主聊天页面组件
 import { Textarea, Button, ActionIcon } from "@mantine/core";
 import { useState, KeyboardEvent } from "react";
-import { getCompletion } from "@/utils/getCompletion";
-import { ChatLogs } from "@/types";
+import chatservice from "@/utils/chatService";
+import { MessageList } from "@/types";
 import clsx from "clsx";
 import {
   clearChatLogs,
@@ -10,7 +10,8 @@ import {
   updateChatLogs,
 } from "@/utils/chatStorage";
 import { useEffect } from "react";
-import { IconEraser, IconSend } from "@tabler/icons-react";
+import { IconEraser, IconSend, IconSendOff } from "@tabler/icons-react";
+import chatService from "@/utils/chatService";
 
 const LOCAL_KEY = "ai-demo";
 export const Chat = () => {
@@ -18,12 +19,21 @@ export const Chat = () => {
   const [completion, setCompletion] = useState<string>("");
   // 使用loading设置输入框、发送消息的图标等是否进入loading状态
   const [loading, setLoading] = useState(false);
-  const [chatList, setChatList] = useState<ChatLogs>([]);
+  const [chatList, setChatList] = useState<MessageList>([]);
+
+  chatservice.actions = {
+    onCompleting(sug) {
+      setSuggestion(sug);
+    },
+    onCompleted() {
+      setLoading(false);
+    },
+  };
 
   useEffect(() => {
     const logs = getChatLogs(LOCAL_KEY);
     setChatList(logs);
-  });
+  },[]);
 
   // 清除当前聊天中的所有聊天内容
   const onClear = () => {
@@ -31,49 +41,96 @@ export const Chat = () => {
     setChatList([]);
   };
 
-  const setChatLogs = (logs: ChatLogs) => {
-    setChatList(logs);
-    updateChatLogs(LOCAL_KEY, logs);
-  };
-
-  // 输入框内按回车键发送消息
-  const onkeyDown = (evt: KeyboardEvent<HTMLTextAreaElement>) => {
-    if (evt.keyCode === 13 && !evt.shiftKey) {
-      evt.preventDefault();
-      getAIResp();
+  const setSuggestion = (suggestion: string) => {
+    if (suggestion === "") return;
+    const len = chatList.length;
+    const lastMessage = len ? chatList[len - 1] : null;
+    let newList: MessageList = [];
+    if (lastMessage?.role === "assistant") {
+      newList = [
+        ...chatList.slice(0, len - 1),
+        {
+          ...lastMessage,
+          content: suggestion,
+        },
+      ];
+    } else {
+      newList = [
+        ...chatList,
+        {
+          role: "assistant",
+          content: suggestion,
+        },
+      ];
     }
+    setMessages(newList);
   };
 
-  // 根据输入的聊天内容（包含localStorage中存储的之前聊天中相关的聊天上下文），向接口发送请求
-  const getAIResp = async () => {
-    setLoading(true);
-    const list = [
+  const setMessages = (msg: MessageList) => {
+    setChatList(msg);
+    updateChatLogs(LOCAL_KEY, msg);
+  };
+
+  const onSubmit = () => {
+    if (loading) {
+      return chatService.cancel();
+    }
+    if (!prompt.trim()) return;
+    let list: MessageList = [
       ...chatList,
       {
         role: "user",
         content: prompt,
       },
     ];
-    setChatLogs(list);
-    const resp = await getCompletion({
-      prompt: prompt,
-      // 每次发送消息时，同时携带之前最近四条的消息记录发送给AI，实现多轮对话功能
-      // 取之前最近几条，可根据具体业务进行确定
-      history: chatList.slice(-4),
+    setMessages(list);
+    setLoading(true);
+    // 使用getStream向后端请求流式数据
+    chatService.getStream({
+      prompt,
+      history: chatList.slice(-6),
     });
-    // 输入prompt后发送消息时，设置输入框内容为空
     setPrompt("");
-
-    setCompletion(resp.content);
-    setChatLogs([
-      ...list,
-      {
-        role: "assistant",
-        content: resp.content,
-      },
-    ]);
-    setLoading(false);
   };
+
+  // 输入框内按回车键发送消息
+  const onkeyDown = (evt: KeyboardEvent<HTMLTextAreaElement>) => {
+    if (evt.keyCode === 13 && !evt.shiftKey) {
+      evt.preventDefault();
+      onSubmit();
+    }
+  };
+
+  // 根据输入的聊天内容（包含localStorage中存储的之前聊天中相关的聊天上下文），向接口发送请求
+  // const getAIResp = async () => {
+  //   setLoading(true);
+  //   const list = [
+  //     ...chatList,
+  //     {
+  //       role: "user",
+  //       content: prompt,
+  //     },
+  //   ];
+  //   setMessages(list);
+  //   const resp = await getCompletion({
+  //     prompt: prompt,
+  //     // 每次发送消息时，同时携带之前最近四条的消息记录发送给AI，实现多轮对话功能
+  //     // 取之前最近几条，可根据具体业务进行确定
+  //     history: chatList.slice(-4),
+  //   });
+  //   // 输入prompt后发送消息时，设置输入框内容为空
+  //   setPrompt("");
+
+  //   // setCompletion(resp.content);
+  //   setMessages([
+  //     ...list,
+  //     {
+  //       role: "assistant",
+  //       content: resp.content,
+  //     },
+  //   ]);
+  //   setLoading(false);
+  // };
 
   return (
     <div className="h-screen flex flex-col items-center">
@@ -136,8 +193,8 @@ export const Chat = () => {
           disabled={loading}
         ></Textarea>
         {/* 将button该为一个发送消息的图标 */}
-        <ActionIcon loading={loading} onClick={() => getAIResp()}>
-          <IconSend></IconSend>
+        <ActionIcon onClick={() => onSubmit()}>
+          {loading ? <IconSendOff /> : <IconSend />}
         </ActionIcon>
         {/* <Button>Send</Button> */}
       </div>
