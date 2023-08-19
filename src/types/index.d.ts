@@ -1,13 +1,18 @@
-export interface ChatLogType {
+export declare interface ChatLogType {
   role: string;
   content: string;
 }
 
-export interface Props {
+export declare interface Props {
   prompt: string;
   history?: ChatLogType[];
   options?: {
     temperature?: number;
     max_tokens?: number;
   };
+}
+
+export declare type ChatLogs = ChatLogType[];
+export declare interface ChatLogsStorage {
+  [key: string]: ChatLogs;
 }
