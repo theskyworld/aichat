@@ -38,3 +38,19 @@ export declare interface Session {
 }
 
 export declare type SessionList = Session[];
+
+// AI助手
+export declare interface Assistant {
+  id: string;
+  name: string;
+  description?: string;
+  prompt: string;
+  temperature?: number;
+  max_log: number;
+  max_tokens: number;
+}
+
+export declare type AssistantList = Assistant[];
+
+export type EditAssistant = Omit<Assistant, "id"> &
+  Partial<Pick<Assistant>, "id">;
