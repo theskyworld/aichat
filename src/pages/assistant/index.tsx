@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { NextPage } from "next";
 import { AssistantList, EditAssistant } from "@/types";
 import { useDisclosure } from "@mantine/hooks";
-import assistantStorage from "@/utils/assistantStorage";
+import * as assistantStorage from "@/utils/assistantStorage";
 import { notifications } from "@mantine/notifications";
 import { DEFAULT_ASSISTANTS } from "@/utils/constants";
 import Link from "next/link";

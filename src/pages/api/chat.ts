@@ -14,7 +14,7 @@ export default async function handler(req: NextRequest) {
   // 从用户发出的请求体中获取prompt提示词、携带的历史记录内容(用于在当前对话中能访问之前的聊天上下文内容)，配置信息
   // 通过history开启多轮对话的功能，携带前几轮对话的能让发送给AI，实现在当前对话中能够记住之前对话的内容
   const { prompt, history = [], options = {} } = await req.json();
-
+  const { max_tokens, temperature } = options;
   // 模拟用户user向AI发出的对话信息
   const data = {
     model: "gpt-3.5-turbo",
@@ -24,7 +24,7 @@ export default async function handler(req: NextRequest) {
       // 配置系统角色
       {
         role: "system",
-        content: "you are a AI assistant",
+        content: options.prompt,
       },
       ...history,
       {
@@ -34,7 +34,8 @@ export default async function handler(req: NextRequest) {
     ],
     // 告诉openai API 开启流式响应
     stream: true,
-    ...options,
+    temperature: +temperature || 0.7,
+    max_tokens : +max_tokens || 1000
   };
 
   // 向openai接口发起POST请求
@@ -55,7 +56,7 @@ export default async function handler(req: NextRequest) {
   // 请求流式响应
   const requestStream = async (payload: StreamPayload) => {
     let counter = 0;
-    const resp = await fetch("https://api.openai.com/v1/chat/completions", {
+    const resp = await fetch("https://chattsw.site/v1/chat/completions", {
       headers: {
         Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
         "Content-Type": "application/json",

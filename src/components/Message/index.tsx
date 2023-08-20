@@ -1,14 +1,21 @@
 // Chat主聊天页面组件
-import { Textarea, Button, ActionIcon } from "@mantine/core";
+import { Textarea, Button, ActionIcon, Popover } from "@mantine/core";
+import Link from "next/link";
 import { useState, KeyboardEvent } from "react";
 import chatservice from "@/utils/chatService";
-import { MessageList } from "@/types";
+import { Assistant, MessageList } from "@/types";
 import clsx from "clsx";
 import * as chatStorage from "@/utils/chatStorage";
 // import { clearMessage, getMessage, updateMessage } from "@/utils/chatStorage";
 import { useEffect } from "react";
-import { IconEraser, IconSend, IconSendOff } from "@tabler/icons-react";
+import {
+  IconDotsVertical,
+  IconEraser,
+  IconSend,
+  IconSendOff,
+} from "@tabler/icons-react";
 import chatService from "@/utils/chatService";
+import { AssistantSelect } from "../AssistantSelect";
 
 interface Props {
   sessionId: string;
@@ -19,6 +26,7 @@ export const Message = ({ sessionId }: Props) => {
   // 使用loading设置输入框、发送消息的图标等是否进入loading状态
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<MessageList>([]);
+  const [assistant, setAssistant] = useState<Assistant>();
 
   const updateMessage = (msg: MessageList) => {
     setMessage(msg);
@@ -35,12 +43,24 @@ export const Message = ({ sessionId }: Props) => {
   };
 
   useEffect(() => {
+    const session = chatStorage.getSession(sessionId);
+    console.log("🚀 ~ file: index.tsx:47 ~ useEffect ~ session:", session);
+    setAssistant(session?.assistant);
+    console.log("🚀 ~ file: index.tsx:48 ~ useEffect ~ assistant:", assistant);
+
     const msg = chatStorage.getMessage(sessionId);
     setMessage(msg);
     if (loading) {
       chatService.cancel();
     }
   }, [sessionId]);
+
+  const onAssistantChange = (assistant: Assistant) => {
+    setAssistant(assistant);
+    chatStorage.updateSession(sessionId, {
+      assistant: assistant.id,
+    });
+  };
 
   // 清除当前聊天中的所有聊天内容
   const onClear = () => {
@@ -96,7 +116,8 @@ export const Message = ({ sessionId }: Props) => {
     // 使用getStream向后端请求流式数据
     chatService.getStream({
       prompt,
-      history: message.slice(-6),
+      options: assistant,
+      history: list.slice(-assistant?.max_log!),
     });
     setPrompt("");
   };
@@ -141,7 +162,39 @@ export const Message = ({ sessionId }: Props) => {
   // };
 
   return (
-    <div className="h-screen flex flex-col items-center w-full">
+    <div className="h-screen flex flex-col w-full">
+      {/* 聊天页面中访问AI助手的入口 */}
+      <div
+        className={clsx(
+          "flex",
+          "justify-between",
+          "items-center",
+          "p-4",
+          "shoadow-sm",
+          "h-[6rem]"
+        )}
+      >
+        <Popover width={100} position="bottom" withArrow shadow="sm">
+          <Popover.Target>
+            <Button
+              size="sm"
+              variant="subtle"
+              className="px-1"
+              rightIcon={<IconDotsVertical size="1rem" />}
+            >
+              AI 助手
+            </Button>
+          </Popover.Target>
+          <Popover.Dropdown>
+            <Link href="/assistant">助手管理</Link>
+          </Popover.Dropdown>
+        </Popover>
+        {/* 助手选择器 */}
+        <AssistantSelect
+          value={assistant?.id}
+          onChange={onAssistantChange}
+        ></AssistantSelect>
+      </div>
       {/* 展示AI返回的聊天内容 */}
       <div
         className={clsx(
@@ -182,7 +235,7 @@ export const Message = ({ sessionId }: Props) => {
           </div>
         ))}
       </div>
-      <div className="flex items-center w-3/5">
+      <div className="flex items-center w-3/5  mt-10">
         {/* 使用图标组件,添加输入框前清除当前所有聊天记录的图标 */}
         <ActionIcon
           disabled={loading}

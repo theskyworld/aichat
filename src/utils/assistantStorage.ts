@@ -54,7 +54,7 @@ const getAssistant = (id: string): Assistant | null => {
   return list.find((item) => item.id === id) || null;
 };
 
-export default {
+export  {
   getAssistantList,
   updateAssistantList,
   addAssistant,

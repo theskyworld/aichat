@@ -35,7 +35,11 @@ export declare interface Actions {
 export declare interface Session {
   name: string;
   id: string;
+  assistant?: string;
 }
+export declare type SessionInfo = Omit<Session, "assistant"> & {
+  assistant: Assistant;
+};
 
 export declare type SessionList = Session[];
 
