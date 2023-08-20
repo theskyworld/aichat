@@ -17,7 +17,8 @@ export default function App({ Component, pageProps }: AppProps) {
   // 页面颜色主题默认为dark
   return (
     <ColorSchemeProvider
-      colorScheme="dark"
+      // colorScheme="dark"
+      colorScheme= {colorScheme}
       toggleColorScheme={toggleColorScheme}
     >
       {/* 提供全局配置属性 */}

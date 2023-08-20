@@ -31,3 +31,10 @@ export declare interface Actions {
   onCompleting: (sug: stirng) => void;
   onCompleted?: (sug: string) => void;
 }
+
+export declare interface Session {
+  name: string;
+  id: string;
+}
+
+export declare type SessionList = Session[];
