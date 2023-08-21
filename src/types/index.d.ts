@@ -21,7 +21,7 @@ export declare interface ChatLogsStorage {
 
 export declare interface StreamPayload {
   model: string;
-  message: MessageList;
+  messages: MessageList;
   temperature?: number;
   stream: boolean;
   max_tokens?: number;
