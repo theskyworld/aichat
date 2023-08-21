@@ -53,6 +53,9 @@ export default async function handler(req: NextRequest) {
   // const json = await resp.json();
   // res.status(200).json({ ...json.choices[0].message });
 
+
+  console.log(process.env.OPENAI_API_KEY)
+  
   // 请求流式响应
   const requestStream = async (payload: StreamPayload) => {
     let counter = 0;
