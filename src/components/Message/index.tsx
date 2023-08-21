@@ -227,7 +227,8 @@ export const Message = ({ sessionId }: Props) => {
                 "py-2",
                 "mt-1",
                 "w-full",
-                "max-w-4xl"
+                "max-w-4xl",
+                "mb-5"
               )}
             >
               {item.content}
