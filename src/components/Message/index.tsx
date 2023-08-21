@@ -235,7 +235,18 @@ export const Message = ({ sessionId }: Props) => {
           </div>
         ))}
       </div>
-      <div className="flex items-center w-3/5  mt-10">
+      <div
+        className={clsx(
+          "flex",
+          "justify-center",
+          "my-4",
+          "self-center",
+          "items-center",
+          "w-3/5",
+          "mt-10",
+          "mb-5"
+        )}
+      >
         {/* 使用图标组件,添加输入框前清除当前所有聊天记录的图标 */}
         <ActionIcon
           disabled={loading}
