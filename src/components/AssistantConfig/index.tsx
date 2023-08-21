@@ -75,7 +75,7 @@ export const AssistantConfig = ({
             type="number"
             variant="filled"
             precision={1}
-            max={2}
+            max={1.5}
             min={0}
             step={0.1}
             value={data.temperature}
@@ -83,7 +83,7 @@ export const AssistantConfig = ({
             onChange={(val) => onNumberChange(val, "temperature")}
           ></NumberInput>
         </Wrapper>
-        <Wrapper label="上下文数" description="每次对话时能够记忆的历史对话1数">
+        <Wrapper label="上下文数" description="每次对话时能够记忆的历史对话数">
           <NumberInput
             type="number"
             variant="filled"
