@@ -242,7 +242,7 @@ export const Message = ({ sessionId }: Props) => {
           "my-4",
           "self-center",
           "items-center",
-          "w-4/5",
+          "w-full",
           "mt-10",
           "mb-5"
         )}
@@ -258,7 +258,7 @@ export const Message = ({ sessionId }: Props) => {
         {/* 使用mantine中的Textarea组件来展示一个输入框，用于用于输入prompt内容 */}
         <Textarea
           placeholder="Enter your prompt"
-          className="w-full mr-5"
+          className="w-full mr-1"
           value={prompt}
           onChange={(evt) => setPrompt(evt.target.value)}
           onKeyDown={(evt) => onkeyDown(evt)}
