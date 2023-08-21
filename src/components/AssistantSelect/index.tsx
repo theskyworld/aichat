@@ -4,7 +4,7 @@ import { Select } from "@mantine/core";
 import { AssistantList, Assistant } from "@/types";
 import * as assistantStorage from "@/utils/assistantStorage";
 interface AssistantSelectProps {
-  value: string;
+  value?: string;
   loading?: boolean;
   onChange: (value: Assistant) => void;
 }
