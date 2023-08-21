@@ -54,10 +54,11 @@ export default async function handler(req: NextRequest) {
   // res.status(200).json({ ...json.choices[0].message });
 
 
-  console.log(process.env.OPENAI_API_KEY)
   
   // 请求流式响应
   const requestStream = async (payload: StreamPayload) => {
+  console.log(process.env.OPENAI_API_KEY)
+    
     let counter = 0;
     const resp = await fetch("https://chattsw.site/v1/chat/completions", {
       headers: {
