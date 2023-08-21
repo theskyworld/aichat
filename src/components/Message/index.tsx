@@ -186,7 +186,7 @@ export const Message = ({ sessionId }: Props) => {
             </Button>
           </Popover.Target>
           <Popover.Dropdown>
-            <Link href="/assistant">助手管理</Link>
+            <Link href="/assistant">AI助手管理</Link>
           </Popover.Dropdown>
         </Popover>
         {/* 助手选择器 */}
