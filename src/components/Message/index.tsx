@@ -242,7 +242,7 @@ export const Message = ({ sessionId }: Props) => {
           "my-4",
           "self-center",
           "items-center",
-          "w-3/5",
+          "w-4/5",
           "mt-10",
           "mb-5"
         )}
