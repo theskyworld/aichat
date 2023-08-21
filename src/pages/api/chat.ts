@@ -35,7 +35,7 @@ export default async function handler(req: NextRequest) {
     // 告诉openai API 开启流式响应
     stream: true,
     temperature: +temperature || 0.7,
-    max_tokens : +max_tokens || 1000
+    max_tokens: +max_tokens || 1000,
   };
 
   // 向openai接口发起POST请求
@@ -53,22 +53,20 @@ export default async function handler(req: NextRequest) {
   // const json = await resp.json();
   // res.status(200).json({ ...json.choices[0].message });
 
-
-  
   // 请求流式响应
   const requestStream = async (payload: StreamPayload) => {
-  console.log(process.env.OPENAI_API_KEY)
-    
     let counter = 0;
+    const OPENAI_API_KEY =
+      "sk-2FbZfxmBmmZAL0RFTfMcVGhlQi5BSQAAxqTfj1bEDdot2Tul";
     const resp = await fetch("https://chattsw.site/v1/chat/completions", {
       headers: {
-        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+        Authorization: `Bearer ${OPENAI_API_KEY}`,
         "Content-Type": "application/json",
       },
       method: "POST",
       body: JSON.stringify(payload),
     });
-    if(resp.status !== 200) {
+    if (resp.status !== 200) {
       return resp.body;
     }
 
