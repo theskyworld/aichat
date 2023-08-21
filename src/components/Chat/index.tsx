@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Message } from "../Message";
 import { Session } from "../Session";
 import * as chatStorage from "@/utils/chatStorage";
+import { MediaQuery } from "@mantine/core";
 
 export const Chat = () => {
   // 当前聊天会话的id
@@ -20,7 +21,12 @@ export const Chat = () => {
 
   return (
     <div className="h-screen flex w-screen">
-      <Session sessionId={sessionId} onChange={setSessionId}></Session>
+      <MediaQuery
+        smallerThan="md"
+        styles={{ width: "0 !important", padding: "0 !important" , overflow : "hidden"}}
+      >
+        <Session sessionId={sessionId} onChange={setSessionId}></Session>
+      </MediaQuery>
       <Message sessionId={sessionId}></Message>
     </div>
   );

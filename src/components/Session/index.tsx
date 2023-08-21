@@ -10,9 +10,10 @@ import { EditableText } from "../EditableText";
 interface SessionProps {
   sessionId: string;
   onChange: (arg: string) => void;
+  className? : string
 }
 
-export const Session = ({ sessionId, onChange }: SessionProps) => {
+export const Session = ({ sessionId, onChange, className }: SessionProps) => {
   const [sessionList, setSessionList] = useState<SessionList>([]);
 
   // 用于切换页面的颜色主题
@@ -52,10 +53,10 @@ export const Session = ({ sessionId, onChange }: SessionProps) => {
     setSessionList(newList);
   };
 
-  const updateSession = (name : string) => {
+  const updateSession = (name: string) => {
     let sessionList = chatStorage.updateSession(sessionId, { name });
     setSessionList(sessionList);
-  }
+  };
 
   // 删除聊天会话
   const removeSession = (id: string) => {
@@ -76,7 +77,8 @@ export const Session = ({ sessionId, onChange }: SessionProps) => {
         "w-64",
         "flex",
         "flex-col",
-        "px-2"
+        "px-2",
+        className,
       )}
     >
       <div className="flex justify-between py-2 w-full">
@@ -102,7 +104,10 @@ export const Session = ({ sessionId, onChange }: SessionProps) => {
           >
             {/* 让当前聊天会话的名字可被编辑修改 */}
             {/* <div>{name}</div> */}
-            <EditableText text={name} onSave={(name) => updateSession(name)}></EditableText>
+            <EditableText
+              text={name}
+              onSave={(name) => updateSession(name)}
+            ></EditableText>
             {sessionList.length > 1 ? (
               <IconTrash
                 size=".8rem"
