@@ -57,8 +57,8 @@ export default async function handler(req: NextRequest) {
   const requestStream = async (payload: StreamPayload) => {
     let counter = 0;
     const OPENAI_API_KEY =
-      "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";
-    const resp = await fetch("https://chattsw.site/v1/chat/completions", {
+      "sk-CMATnZ54mL97aLGHPBoNVGhlQi5BSQKCC630NygjAgKJZxRp";
+    const resp = await fetch("https://chattsw.site/v1", {
       headers: {
         Authorization: `Bearer ${OPENAI_API_KEY}`,
         "Content-Type": "application/json",
