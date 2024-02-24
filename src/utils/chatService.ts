@@ -52,7 +52,7 @@ class ChatService {
         headers: {
           "Content-Type": "application/json",
         },
-        method: "POST",
+        method: "GET",
         body: JSON.stringify({ prompt, history, options }),
         signal: this.controller.signal,
       });

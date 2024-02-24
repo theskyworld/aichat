@@ -63,7 +63,7 @@ export default async function handler(req: NextRequest) {
         Authorization: `Bearer ${OPENAI_API_KEY}`,
         "Content-Type": "application/json",
       },
-      method: "POST",
+      method: "GET",
       body: JSON.stringify(payload),
     });
     if (resp.status !== 200) {
