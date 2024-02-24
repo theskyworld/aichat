@@ -48,11 +48,11 @@ class ChatService {
     // 存储最终解析后的展示在页面中的响应消息内容
     let suggestion = "";
     try {
-      const resp = await fetch("/v1", {
+      const resp = await fetch("/api/chat", {
         headers: {
           "Content-Type": "application/json",
         },
-        method: "GET",
+        method: "POST",
         body: JSON.stringify({ prompt, history, options }),
         signal: this.controller.signal,
       });

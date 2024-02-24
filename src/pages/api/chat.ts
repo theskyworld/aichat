@@ -58,12 +58,12 @@ export default async function handler(req: NextRequest) {
     let counter = 0;
     const OPENAI_API_KEY =
       "sk-CMATnZ54mL97aLGHPBoNVGhlQi5BSQKCC630NygjAgKJZxRp";
-    const resp = await fetch("https://chattsw.site", {
+    const resp = await fetch("https://chattsw.site/v1/chat/completions", {
       headers: {
         Authorization: `Bearer ${OPENAI_API_KEY}`,
         "Content-Type": "application/json",
       },
-      method: "GET",
+      method: "POST",
       body: JSON.stringify(payload),
     });
     if (resp.status !== 200) {
