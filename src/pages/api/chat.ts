@@ -17,7 +17,7 @@ export default async function handler(req: NextRequest) {
   const { max_tokens, temperature } = options;
   // 模拟用户user向AI发出的对话信息
   const data = {
-    model: "gpt-3.5-turbo",
+    model: "gpt-4",
     messages: [
       // role分为user、assistant和system，分别对应对话过程中的用户、AI和中间处理系统的角色
       // 不同角色之间，对content有着不同的处理

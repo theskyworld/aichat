@@ -16,7 +16,7 @@ import {
 } from "@tabler/icons-react";
 import chatService from "@/utils/chatService";
 import { AssistantSelect } from "../AssistantSelect";
-
+import {Markdown} from "../Markdown"
 interface Props {
   sessionId: string;
 }
@@ -44,9 +44,9 @@ export const Message = ({ sessionId }: Props) => {
 
   useEffect(() => {
     const session = chatStorage.getSession(sessionId);
-    console.log("🚀 ~ file: index.tsx:47 ~ useEffect ~ session:", session);
+    // console.log("🚀 ~ file: index.tsx:47 ~ useEffect ~ session:", session);
     setAssistant(session?.assistant);
-    console.log("🚀 ~ file: index.tsx:48 ~ useEffect ~ assistant:", assistant);
+    // console.log("🚀 ~ file: index.tsx:48 ~ useEffect ~ assistant:", assistant);
 
     const msg = chatStorage.getMessage(sessionId);
     setMessage(msg);
@@ -206,7 +206,10 @@ export const Message = ({ sessionId }: Props) => {
           "px-8"
         )}
       >
-        {message.map((item, index) => (
+        {message.map((item, index) => {
+          // 只对AI返回的内容进行md渲染
+          const isUser = item.role === "user";
+          return (
           <div
             key={`${item.role}-${index}`}
             className={clsx(
@@ -231,10 +234,17 @@ export const Message = ({ sessionId }: Props) => {
                 "mb-5"
               )}
             >
-              {item.content}
+              {
+                isUser ? (
+                  <div>{item.content}</div>
+                ) : (
+                  <div><Markdown markdownText={item.content}/></div>
+                )
+              }
             </div>
           </div>
-        ))}
+        )
+        })}
       </div>
       <div
         className={clsx(
